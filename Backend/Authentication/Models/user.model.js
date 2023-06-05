@@ -4,8 +4,10 @@ import dbs from "../DB/index.js"
 
 let UserSchena= new Schema(
     {
-        name :String,
-        clientId:String,
+        name :{type: String, unique:true},
+        userId:String,
+        email:String,
+        image_url:String,
         files:Array,
     },
     {timestamps:true}
