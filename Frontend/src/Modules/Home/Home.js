@@ -1,109 +1,105 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Home.css'
-import { add_file, get_user_detail } from '../../Service/api.user';
+import { get_user_detail } from '../../Service/api.user';
 import { saveAs } from 'file-saver';
-import FileDownload from "js-file-download"
 const Home = () => {
-  const location=useLocation()
-  
-
-  const [fileData,setFileData]=useState("")
-  const [fileName,setFileName]=useState("")
-  const [fileArray,setFileArray]=useState(location.state?.files)
-  const navigate=useNavigate()
-
-  const token=localStorage.getItem('token')
-  const checkToken=token===null
-   useEffect(()=>{
-    if (checkToken){
-   navigate('/login')
-  } 
-  },[checkToken])
-//   const token=localStorage.getItem('token')
-// const checkToken=token===null
-// console.log(checkToken)
- 
-//    useEffect(()=>{
-//     console.log('dssdffdsafdsa')
-//     if(token===null){
-//    return navigate('/login')
-//     }
-//    },[checkToken])
-  
-
-  function updateImage(e){
-    const data=(e.target.files[0])
-   
+  const location = useLocation()
+  const [fileData, setFileData] = useState("")
+  const [fileName, setFileName] = useState("")
+  const [fileArray, setFileArray] = useState(location.state?.files ? location.state?.files : [])
+  const navigate = useNavigate()
+  const token = localStorage.getItem('token')
+  const checkToken = token === null
+  useEffect(() => {
+    if (checkToken) {
+      navigate('/login')
+    }
+    async function getDetails() {
+      const data = await get_user_detail(location.state?.userId)
+      setFileArray(data.data?.files)
+    }
+    getDetails()
+  }, [checkToken])
+  function updateImage(e) {
+    const data = (e.target.files[0])
     setFileData(data)
-  } 
-function download(a,b){
-  console.log(a)
-  saveAs(a,b)
-}
-
-  async function onSubmit(){
-  async function funcs(){
-    const form = new FormData();
-    form.append('my_file', fileData);
-    form.append("filename",fileName)
-    form.append("userId", location.state.userId)
-  const value= await fetch("http://localhost:5050/authentication/api/addfile", {
-    method:"POST",
-    body:form,
-  }).then(res=>res.json());
-  console.log(value)
-  setFileArray(value.files)
-
   }
-  funcs()
-  
+  function download(file, filename) {
+    saveAs(file, filename)
   }
-  function onLogout(){
+  async function onSubmit() {
+    async function funcs() {
+      const form = new FormData();
+      form.append('my_file', fileData);
+      form.append("filename", fileName)
+      form.append("userId", location.state.userId)
+      const value = await fetch("http://localhost:5050/authentication/api/addfile", {
+        method: "POST",
+        body: form,
+      }).then(res => res.json());
+      setFileArray(value.files)
+    }
+    funcs()
+  }
+  function onLogout() {
     localStorage.removeItem("token")
     navigate('/login')
   }
-console.log(fileArray)
-  return(
-  <div data-testid="Home" className='home-bg'>
-    <div className='container'>
-    <div className='row'>
-    
- 
-   <h1 className='text-center home-heading '> Welcome <span style={{color:"orange", fontSize:"48px", fontWeight:"bolder"}}>{location.state?.name}</span></h1>
-   </div>
-   <div className='row'>
-   <div className='col-md-6'>
-   <input type="text" placeholder='File Name' value={fileName} className="form-control mb-4"  onChange={(e)=>setFileName(e.target.value)} />
-
-   <input type="file" placeholder='' className="form-control mb-4" onChange={updateImage} />
-   <button className='btn btn-primary' type="button" onClick={()=>onSubmit()} >Submit</button>
-</div>
-<div className='col-md-4'>
-  <button className='btn btn-danger' onClick={onLogout}>Logout</button>
-</div>
-</div>
-<div className='row'>
-
-{fileArray.length>0?(<div>
-  <h3 className='text-center fw-bolder mb-3'>Files List</h3>
-                {fileArray.map((data, index) => (
-<div>
-  <h3>{data[1]}</h3>
-  <button onClick={()=>download(data[0],data[1])} type='button' className='btn btn-primary'>Download</button>
-  </div>
-                ))}
-  
-</div>):<></>
+  return (
+    <div data-testid="Home" className='home-bg'>
+      <div className='d-flex justify-content-end  p-3'>
+        <button className='btn btn-danger' onClick={onLogout}>Logout</button>
+      </div>
+      <div className='container'>
+        <div className='row'>
+          <div className='col-md-10'>
+            <h1 className='text-center home-heading '> Welcome <span style={{ color: "orange", fontSize: "48px", fontWeight: "bolder" }}>{location.state?.name}</span></h1>
+          </div>
+        </div>
+        <div className='row align-items-center justify-content-center'>
+          <div className='col-md-12 '>
+            <h4 className="form-label">File Name</h4>
+            <div className="input-group text-center">
+              <input type="text" placeholder='Enter File Name' value={fileName} className="form-control col-md-4 mb-4" onChange={(e) => setFileName(e.target.value)} />
+            </div>
+            <h4 className="form-label">File Upload</h4>
+            <div className="input-group ">
+              <input type="file" placeholder='' className="form-control col-md-4 mb-4 " onChange={updateImage} />
+            </div>
+            <button className='btn btn-primary' type="button" onClick={() => onSubmit()} >Submit</button>
+          </div>
+        </div>
+        <div className='row'>
+          {fileArray?.length > 0 ? (<div>
+            <h3 className='text-center fw-bolder mb-3 mt-5'>Files List</h3>
+            <div>
+              <table className="table table-bordered">
+                <thead>
+                  <tr className='table-info'>
+                    <th scope="col">No</th>
+                    <th scope="col">File Name</th>
+                    <th scope="col">Download</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fileArray.map((data, index) => (
+                    <tr className='table-warning' key={index}>
+                      <td>{index + 1}</td>
+                      <td>{data[1]}</td>
+                      <td><button onClick={() => download(data[0], data[1])} type='button' className='btn btn-primary'>Download</button> </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>) : <></>
+          }
+        </div>
+      </div>
+    </div>
+  )
 }
-
-  </div>
-  </div>
-  </div>
-)
-  }
 Home.propTypes = {};
-
 Home.defaultProps = {};
-
 export default Home;

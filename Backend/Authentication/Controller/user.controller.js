@@ -4,31 +4,23 @@ import fs from "fs"
 import path from "path";
 const {sign}=jwt
 const accessTokenSecret = 'Signinappsecret';
-
 const AuthenticateUser=async (req,res)=>{
 const data=req.body.email
 try{
     var token=""
-
     const get= await UserModel.findOne({email:data})
-
     if(get!==null){
-
-    
     var token = sign({data:{user_id : get.userId,Email: get.email,Name:get.name,Picture:get.picture}}, accessTokenSecret);
     const user_data={data:get,token}
     res.status(200).json(user_data)
     }else{
-     
     res.status(200).json(get)
     }
-   
 }catch(err){
     console.log(err)
     res.status(400).json({message:"Internal Error"})
 }
 }
-
 const StoreUser=async(req,res)=>{
     const data=req.body
     const name=req.body.name
@@ -37,7 +29,6 @@ const StoreUser=async(req,res)=>{
       }else{
         var val=name
       }
-    
       function createVal(val){
         let id=val
         for (let i = 0; i < 5; i++) {
@@ -45,9 +36,7 @@ const StoreUser=async(req,res)=>{
           if (id.length===6){
               return id
           }
-         
       }
-     
       }
       var userId=''
       var tembId=createVal(val)
@@ -72,16 +61,11 @@ const StoreUser=async(req,res)=>{
         console.log(err)
         res.status(400).json({message:"Internal Error"})
     }
-
 }
-
 const StoreFile=async(req,res)=>{
-
-   
     const data=req.body
     const file = req.files.my_file;
     console.log(data)
-    
     console.log(data)
     var dir = `./Upload/${data.userId}`;
     const name=file.name
@@ -90,22 +74,15 @@ const StoreFile=async(req,res)=>{
         fs.mkdirSync(dir, { recursive: true });
       }
     var path=dir+'/'+name;
-
   file.mv(path, async(err) => {
-    
     if (err) {
       console.log(err)
       return res.status(500).send(err);
     }
     const findArray=await UserModel.findOne({userId:data.userId})
     console.log(findArray)
-   
-
-    
     const arr=findArray.files
-    
- 
-    arr.push( [`D:/sathiyaProjects/google_signin_assessment/Backend/Authentication/Upload/${data.userId}/${name}`,name])
+    arr.push( [`http://localhost:5051/files/${data.userId}/${name}`, data.filename])
     const updateArray=await UserModel.updateOne({userId:data.userId},
         {
             $set:{
@@ -114,23 +91,16 @@ const StoreFile=async(req,res)=>{
         }
         )
         const updatedArray=await UserModel.findOne({userId:data.userId})
- 
    return res.status(200).json(updatedArray)
-   
   });
-
-    
 }
-
 const GetFiles=async(req,res)=>{
     const userId=req.params.id
     try{
         const data= await UserModel.findOne({userId:userId})
         res.status(200).json(data)
-
     }catch(err){
         res.status(400).json({message:"Internal Error"})
     }
 }
-
 export {AuthenticateUser, StoreUser,StoreFile,GetFiles}

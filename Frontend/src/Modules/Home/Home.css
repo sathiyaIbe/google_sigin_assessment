@@ -4,8 +4,8 @@
     letter-spacing: .15rem;
     margin-top: 20px;
 }
-
 .home-bg{
     background-color: rgb(243, 234, 218);
     min-height: 100vh;
+    min-width: 100vw;
 }

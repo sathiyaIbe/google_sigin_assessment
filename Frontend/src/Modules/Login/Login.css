@@ -1,0 +1,46 @@
+.heading {
+    font-size: 32px;
+    font-family: "Roboto";
+    font-weight: bolder;
+    letter-spacing: .1rem;
+    text-transform: uppercase;
+    color: orange
+}
+.main-login-container {
+    min-height: 100vh;
+    background-size: cover;
+    background-color: rgb(243, 234, 218) !important;
+    margin-top: 0 !important;
+}
+.cons {
+    min-height: 100vh;
+    display: flex !important;
+    justify-content: center;
+    align-items: center !important;
+}
+.img-containers {
+    width: 300px;
+}
+.card-containers {
+    background-color: #fff;
+    padding: 40px;
+    width: fit-content;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+    display: flex;
+}
+.body-containers {
+    margin-top: 110px;
+}
+@media screen and (max-width:768px) {
+    .card-containers {
+        display: flex !important;
+        flex-direction: column;
+        padding: 25px;
+    }
+    .body-containers {
+        margin-top: 0px;
+    }
+    .img-containers {
+        width: 200px;
+    }
+}
