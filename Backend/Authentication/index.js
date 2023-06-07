@@ -15,7 +15,6 @@ app.use(fileUpload())
 app.use(urlencoded({ extended: false }));
 console.log(__dirname)
 app.use('/files', express.static(__dirname+ '/Upload'))
-app.use('/images', express.static(__dirname + '/upload/images'));
 app.get('/authentication', (req,res)=>res.send("Hello"))
  app.use('/authentication/api', router)
 app.listen(5051, () => {

@@ -33,9 +33,14 @@ const Home = () => {
       const form = new FormData();
       form.append('my_file', fileData);
       form.append("filename", fileName)
-      form.append("userId", location.state.userId)
+      form.append("userId", location.state?.userId)
+      console.log(token)
       const value = await fetch("http://localhost:5050/authentication/api/addfile", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json/form-data",
+          Authorization: `Bearer ${token}`,
+        },
         body: form,
       }).then(res => res.json());
       setFileArray(value.files)

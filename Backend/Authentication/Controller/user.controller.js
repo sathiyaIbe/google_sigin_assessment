@@ -1,6 +1,7 @@
 import { UserModel } from "../Models/user.model.js";
 import jwt  from 'jsonwebtoken'
 import fs from "fs"
+import { checkToken } from "../Service/Auth.js";
 import path from "path";
 const {sign}=jwt
 const accessTokenSecret = 'Signinappsecret';
@@ -64,35 +65,38 @@ const StoreUser=async(req,res)=>{
 }
 const StoreFile=async(req,res)=>{
     const data=req.body
-    const file = req.files.my_file;
-    console.log(data)
-    console.log(data)
-    var dir = `./Upload/${data.userId}`;
-    const name=file.name
-    if (!fs.existsSync(dir)) {
-        console.log(dir);
-        fs.mkdirSync(dir, { recursive: true });
-      }
-    var path=dir+'/'+name;
-  file.mv(path, async(err) => {
-    if (err) {
-      console.log(err)
-      return res.status(500).send(err);
-    }
-    const findArray=await UserModel.findOne({userId:data.userId})
-    console.log(findArray)
-    const arr=findArray.files
-    arr.push( [`http://localhost:5051/files/${data.userId}/${name}`, data.filename])
-    const updateArray=await UserModel.updateOne({userId:data.userId},
-        {
-            $set:{
-                files:arr
-            }
-        }
-        )
-        const updatedArray=await UserModel.findOne({userId:data.userId})
-   return res.status(200).json(updatedArray)
-  });
+    const token=req.headers.authorization
+    console.log(checkToken(token))
+
+
+  //   const file = req.files?.my_file;
+  //   console.log(data)
+  //   console.log(req.files)
+  //   var dir = `./Upload/${data.userId}`;
+  //   const name=file?.name
+  //   if (!fs.existsSync(dir)) {
+  //       console.log(dir);
+  //       fs.mkdirSync(dir, { recursive: true });
+  //     }
+  //   var path=dir+'/'+name;
+  // file.mv(path, async(err) => {
+  //   if (err) {
+  //     console.log(err)
+  //     return res.status(500).send(err);
+  //   }
+  //   const findArray=await UserModel.findOne({userId:data.userId})
+  //   const arr=findArray?.files
+  //   arr.push( [`http://localhost:5051/files/${data.userId}/${name}`, data.filename])
+  //   const updateArray=await UserModel.updateOne({userId:data.userId},
+  //       {
+  //           $set:{
+  //               files:arr
+  //           }
+  //       }
+  //       )
+  //       const updatedArray=await UserModel.findOne({userId:data.userId})
+  //  return res.status(200).json(updatedArray)
+  // });
 }
 const GetFiles=async(req,res)=>{
     const userId=req.params.id
