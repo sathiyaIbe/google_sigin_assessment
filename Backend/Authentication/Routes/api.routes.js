@@ -1,8 +1,10 @@
 import { Router } from "express";
-import { AuthenticateUser, StoreUser, StoreFile, GetFiles } from "../Controller/user.controller.js";
+import { authenticateJWT } from "../Service/Auth.js";
+import { AuthenticateUser, StoreUser, StoreFile, GetFiles ,DownloadFiles} from "../Controller/user.controller.js";
 var router = Router();
 router.post('/authuser', AuthenticateUser)
 router.post('/saveuser', StoreUser)
-router.post("/addfile", StoreFile)
-router.get('/getuser/:id', GetFiles)
+router.put("/addfile",authenticateJWT, StoreFile)
+router.post('/getuser',authenticateJWT, GetFiles)
+router.post("/downloadfiles",authenticateJWT,DownloadFiles)
 export default router

@@ -3,16 +3,21 @@ import { useNavigate } from 'react-router-dom'
 import { GoogleOAuthProvider, GoogleLogin, } from '@react-oauth/google';
 import { auth_user, store_user } from '../../Service/api.user';
 import jwt_decode from "jwt-decode"
+import toast, { Toaster } from 'react-hot-toast';
 import "./Login.css"
 const Login = () => {
   const navigate = useNavigate()
   const token = localStorage.getItem('token')
   const checkToken = token === null
-  useEffect(() => {
+  function checkLogin(){
     if (!checkToken) {
       return navigate('/')
     }
-  }, [checkToken])
+   
+  }
+  useEffect(() => {
+   checkLogin()
+  })
   function login() {
     return (
       <GoogleOAuthProvider clientId="294463467504-bnndpl3sff1i5bkdctfukudlq83nv127.apps.googleusercontent.com">
@@ -26,9 +31,7 @@ const Login = () => {
                 image_url: decode_data.picture
               }
               const checkUser = await auth_user(data)
-              console.log(checkUser.data)
               if (checkUser.data === null) {
-                console.log("empty")
                 const store = await store_user(data)
                 const values = store.data.data
                 if (store.status === 200) {
@@ -46,7 +49,7 @@ const Login = () => {
             //navigate('/')
           }}
           onError={() => {
-            console.log('Login Failed');
+            toast.error("Login not found")
           }}
           useOneTap
         />
@@ -55,6 +58,7 @@ const Login = () => {
   }
   return (
     <div data-testid="Login" className=' main-login-container'>
+      <Toaster position="top-center" reverseOrder={false} />
       <div className=' card-container  '>
         <h1 className='heading text-center pt-5 '>File Upload using Google sigin </h1>
         <div className='cons'>
