@@ -69,9 +69,13 @@ const StoreUser = async (req, res) => {
   }
 }
 const StoreFile = async (req, res) => {
+  
+  const userId = req.user.data.user_id
+
   const data = req.body
+  console.log(data)
   const file = req.files?.my_file;
-  var dir = `./Upload/${data.userId}`;
+  var dir = `./Upload/${userId}`;
   const extension = path.extname(file?.name)
   const name = data?.filename + extension
   //Folder creating 
@@ -85,17 +89,17 @@ const StoreFile = async (req, res) => {
       return res.status(500).json(err);
     }
     try {
-      const findArray = await UserModel.findOne({ userId: data.userId })
+      const findArray = await UserModel.findOne({ userId: userId })
       const arr = findArray?.files
       arr.push([data.filename,name])
-      const updateArray = await UserModel.updateOne({ userId: data.userId },
+      const updateArray = await UserModel.updateOne({ userId: userId },
         {
           $set: {
             files: arr
           }
         }
       )
-      const updatedArray = await UserModel.findOne({ userId: data.userId })
+      const updatedArray = await UserModel.findOne({ userId: userId })
       const filteredData =
       {
         name: updatedArray.name,
@@ -109,7 +113,7 @@ const StoreFile = async (req, res) => {
   });
 }
 const GetFiles = async (req, res) => {
-  const userId = req.body.userId
+  const userId = req.user.data.user_id
   try {
     const data = await UserModel.findOne({ userId: userId })
     const filteredData =
@@ -124,10 +128,15 @@ const GetFiles = async (req, res) => {
   }
 }
 const DownloadFiles = async (req, res) => {
+
+  const userId = req.user.data.user_id
+
+
   const data = req.body
+  console.log(data)
   try {
-    const filePath = path.join(__dirname, `../Upload/${data.userId}/${data.file}`);
-    res.download(filePath, "jack");
+    const filePath = path.join(__dirname, `../Upload/${userId}/${data.file}`);
+    res.download(filePath);
   } catch (err) {
     res.status(400).json("Internal Error")
   }

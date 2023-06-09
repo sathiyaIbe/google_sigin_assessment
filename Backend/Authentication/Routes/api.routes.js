@@ -5,6 +5,6 @@ var router = Router();
 router.post('/authuser', AuthenticateUser)
 router.post('/saveuser', StoreUser)
 router.put("/addfile",authenticateJWT, StoreFile)
-router.post('/getuser',authenticateJWT, GetFiles)
+router.get('/getuser',authenticateJWT, GetFiles)
 router.post("/downloadfiles",authenticateJWT,DownloadFiles)
 export default router

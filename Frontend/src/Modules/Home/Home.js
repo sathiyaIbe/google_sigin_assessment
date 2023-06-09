@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './Home.css'
 import toast, { Toaster } from 'react-hot-toast';
 import { get_user_detail, download_user_files } from '../../Service/api.user';
+import { gettoken } from '../../Service/token';
 const Home = () => {
   const location = useLocation()
   const [fileData, setFileData] = useState("")
@@ -35,21 +36,21 @@ const Home = () => {
     const size = (data.size / 10000)
     if (size > 500) {
       setFileValue("")
-      toast.error("File Size nust be less than 5mb")
+      toast.error("File Size must be less than 5mb")
     } else {
       setFileValue(e.target.value)
       setFileData(data)
     }
   }
   async function download(file) {
-    const data = { token, file, userId }
+    const data = {file}
     try {
       const downloadFile = await download_user_files(data)
       const blob = new Blob([downloadFile.data], { type: downloadFile.data.type });
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = file;
-      link.click();
+       const link = document.createElement("a");
+       link.href = window.URL.createObjectURL(blob);
+       link.download = file;
+       link.click();
     }
     catch (err) {
       toast.error("File Not Found");
@@ -60,12 +61,13 @@ const Home = () => {
       const form = new FormData();
       form.append('my_file', fileData);
       form.append("filename", fileName)
-      form.append("userId", location.state?.userId)
-      form.append("token", token)
       try {
         const value = await fetch("http://localhost:5050/authentication/api/addfile", {
           method: "PUT",
           body: form,
+          headers: {
+            Authorization: `Bearer ${gettoken()}`,
+          },
         }).then(res => res.json());
         if (value.message === "Internal Error") {
           toast.error("Not Uploaded")
